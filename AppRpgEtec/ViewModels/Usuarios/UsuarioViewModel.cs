@@ -1,5 +1,6 @@
 ﻿using AppRpgEtec.Models;
 using AppRpgEtec.Services.Usuarios;
+using AppRpgEtec.Views.Personagens;
 using AppRpgEtec.Views.Usuarios;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,13 @@ namespace AppRpgEtec.ViewModels.Usuarios
         public ICommand RegistrarCommand { get; set; }
         public ICommand DirecionarCadastroCommand { get; set; }
 
+        public void InicializarCommands()
+        {
+            RegistrarCommand = new Command(async () => await RegistrarUsuario());
+            AutenticarCommand = new Command(async () => await AutenticarUsuario());
+            DirecionarCadastroCommand = new Command(async () => await DirecionarParaCadastro());
+        }
+
         #region AtributosPropriedades
         //As propriedades serão chamadas na View futuramente
         //ctor + TAB + TAB: Atalho para criar o construtor
@@ -22,12 +30,6 @@ namespace AppRpgEtec.ViewModels.Usuarios
         {
             uService = new UsuarioService();
             InicializarCommands();
-        }
-        public void InicializarCommands()
-        {
-            AutenticarCommand = new Command(async () => await AutenticarUsuario());
-            RegistrarCommand = new Command(async () => await RegistrarUsuario());
-            DirecionarCadastroCommand = new Command(async () => await DirecionarParaCadastro());
         }
 
         private string login = string.Empty;
@@ -77,7 +79,7 @@ namespace AppRpgEtec.ViewModels.Usuarios
                     await Application.Current.MainPage
                         .DisplayAlert("Informação", mensagem, "Ok");
 
-                    Application.Current.MainPage = new MainPage();
+                    Application.Current.MainPage = new AppShell();
                 }
                 else
                 {
