@@ -5,19 +5,33 @@
              Title="ListagemView">
 
     <Shell.TitleView>
-        <Button Command="{Binding NovoPersonagem}"></Button>
+        <Button Command="{Binding NovoPersonagemCommand}" Text="Novo" HorizontalOptions="End"></Button>
     </Shell.TitleView>
 
     <ScrollView>
         <VerticalStackLayout Padding="10,0,0,0" VerticalOptions="Fill">
 
-            <CollectionView x:Name="listView" ItemsSource="{Binding Personagens}" VerticalOptions="Fill">
+            <CollectionView x:Name="collectionView" ItemsSource="{Binding Personagens}" 
+                VerticalOptions="Fill"
+                SelectionMode="Single"
+                SelectedItem="{Binding PersonagemSelecionado}" >
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <VerticalStackLayout Padding="10">
-                            <Label Text="{Binding Nome}" FontSize="18" FontAttributes="Bold" />
-                            <Label Text="{Binding PontosVida}" FontSize="14" />
-                        </VerticalStackLayout>
+                        <SwipeView>
+                            <SwipeView.RightItems>
+                                <SwipeItems>
+                                    <SwipeItem Text="Remover" IsDestructive="True" 
+                            Command="{Binding BindingContext.RemoverPersonagemCommand,
+                            Source={x:Reference collectionView}}"
+                            CommandParameter="{Binding .}" />
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+
+                            <Grid Padding="10" RowDefinitions="Auto,Auto">
+                                <Label Grid.Row="0" Text="{Binding Nome}" FontSize="18" FontAttributes="Bold" />
+                                <Label Grid.Row="1" Text="{Binding PontosVida}" FontSize="14" />
+                            </Grid>
+                        </SwipeView>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
