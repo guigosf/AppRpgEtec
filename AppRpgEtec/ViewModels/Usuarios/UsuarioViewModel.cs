@@ -1,5 +1,7 @@
 ﻿using AppRpgEtec.Models;
 using AppRpgEtec.Services.Usuarios;
+using AppRpgEtec.ViewModels.Armas;
+using AppRpgEtec.Views.Armas;
 using AppRpgEtec.Views.Personagens;
 using AppRpgEtec.Views.Usuarios;
 using System;
@@ -79,7 +81,7 @@ namespace AppRpgEtec.ViewModels.Usuarios
                     await Application.Current.MainPage
                         .DisplayAlert("Informação", mensagem, "Ok");
 
-                    Application.Current.MainPage = new AppShell();
+                    Application.Current.MainPage = new CadastroArmaView();
                 }
                 else
                 {

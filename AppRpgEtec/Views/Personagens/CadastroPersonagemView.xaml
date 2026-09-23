@@ -11,7 +11,7 @@
 
             <Label Text="Nome" FontSize="Medium" />
             <Entry Text="{Binding Nome}" FontSize="Medium" />
-            
+
             <Label Text="Classe" FontSize="Medium" />
             <Picker Title="---Selecione---" ItemsSource="{Binding ListaTiposClasse}" ItemDisplayBinding="{Binding Descricao}" SelectedItem="{Binding TipoClasseSelecionado}" />
             
