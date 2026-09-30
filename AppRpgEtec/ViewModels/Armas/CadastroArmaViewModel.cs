@@ -5,7 +5,8 @@ using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 namespace AppRpgEtec.ViewModels.Armas
-{    
+{
+    [QueryProperty("ArmaSelecionadaId", "aId")]
     public class CadastroArmaViewModel : BaseViewModel
     {
         private ArmaService aService;
@@ -14,18 +15,18 @@ namespace AppRpgEtec.ViewModels.Armas
         public CadastroArmaViewModel()
         {
             string token = Preferences.Get("UsuarioToken", string.Empty);
+
             aService = new ArmaService(token);
             pService = new PersonagemService(token);
 
-            ObterPersonagens();
+            Personagens = new ObservableCollection<Personagem>();
 
-            //SalvarCommand = new Command(async () => await SalvarArma());
+            _ = ObterPersonagens();
+
             SalvarCommand = new Command(SalvarArma);
         }
 
         public ICommand SalvarCommand { get; set; }
-
-
 
         #region Atributos_Propriedades
 
@@ -41,6 +42,9 @@ namespace AppRpgEtec.ViewModels.Armas
             {
                 id = value;
                 OnPropertyChanged(nameof(Id));
+
+                if (id != 0)
+                    _ = ObterArma();
             }
         }
 
@@ -53,6 +57,7 @@ namespace AppRpgEtec.ViewModels.Armas
                 OnPropertyChanged(nameof(Nome));
             }
         }
+
         public int Dano
         {
             get => dano;
@@ -60,9 +65,9 @@ namespace AppRpgEtec.ViewModels.Armas
             {
                 dano = value;
                 OnPropertyChanged(nameof(Dano));
-
             }
         }
+
         public int PersonagemId
         {
             get => personagemId;
@@ -74,6 +79,7 @@ namespace AppRpgEtec.ViewModels.Armas
         }
 
         private Personagem personagemSelecionado;
+
         public Personagem PersonagemSelecionado
         {
             get { return personagemSelecionado; }
@@ -85,7 +91,7 @@ namespace AppRpgEtec.ViewModels.Armas
                     OnPropertyChanged(nameof(PersonagemSelecionado));
                 }
             }
-        }       
+        }
 
         public ObservableCollection<Personagem> Personagens { get; set; }
 
@@ -93,9 +99,7 @@ namespace AppRpgEtec.ViewModels.Armas
 
         #region Metodos
 
-
-
-        public async void ObterPersonagens()
+        public async Task ObterPersonagens()
         {
             try
             {
@@ -104,7 +108,30 @@ namespace AppRpgEtec.ViewModels.Armas
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message, "Ok");
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ops", ex.Message, "Ok");
+            }
+        }
+
+        public async Task ObterArma()
+        {
+            try
+            {
+                Arma arma = await aService.GetArmaAsync(Id);
+
+                Nome = arma.Nome;
+                Dano = arma.Dano;
+                PersonagemId = arma.PersonagemId;
+
+                await ObterPersonagens();
+
+                PersonagemSelecionado =
+                    Personagens.FirstOrDefault(p => p.Id == arma.PersonagemId);
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ops", ex.Message, "Ok");
             }
         }
 
@@ -114,10 +141,10 @@ namespace AppRpgEtec.ViewModels.Armas
             {
                 Arma model = new Arma()
                 {
-                    Id = this.id,
-                    Nome = this.nome,
-                    Dano = this.dano,
-                    PersonagemId = this.personagemSelecionado.Id
+                    Id = this.Id,
+                    Nome = this.Nome,
+                    Dano = this.Dano,
+                    PersonagemId = this.PersonagemSelecionado.Id
                 };
 
                 if (model.Id == 0)
@@ -125,20 +152,54 @@ namespace AppRpgEtec.ViewModels.Armas
                 else
                     await aService.PutArmaAsync(model);
 
-                await Application.Current.MainPage.DisplayAlert("Mensagem", "Dados salvo com sucesso", "Ok");
+                await Application.Current.MainPage.DisplayAlert(
+                    "Mensagem", "Dados salvos com sucesso", "Ok");
 
                 await Shell.Current.GoToAsync("..");
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                await Application.Current.MainPage.DisplayAlert("Ops!", ex.Message, "Ok");
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ops!", ex.Message, "Ok");
+            }
+        }
+        public async void CarregarArma()
+        {
+            try
+            {
+                Arma a = await aService.GetArmaAsync(
+                    int.Parse(armaSelecionadaId));
+
+                this.Nome = a.Nome;
+                this.Dano = a.Dano;
+                this.Id = a.Id;
+                this.PersonagemId = a.PersonagemId;
+
+                await ObterPersonagens();
+
+                PersonagemSelecionado = Personagens
+                    .FirstOrDefault(p => p.Id == a.PersonagemId);
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                    "Ops", ex.Message, "Ok");
+            }
+        }
+        private string armaSelecionadaId;
+
+        public string ArmaSelecionadaId
+        {
+            set
+            {
+                if (value != null)
+                {
+                    armaSelecionadaId = value;
+                    CarregarArma();
+                }
             }
         }
 
-        
         #endregion
-
-
-
     }
 }

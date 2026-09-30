@@ -9,13 +9,13 @@
     Title="AppRpgEtec">
 
     <ShellContent
-        Title="Home"
+        Title="Personagens"
         ContentTemplate="{DataTemplate viewsPersonagens:ListagemView}"
         Route="MainPage" />
-
-    <ShellContent
-        Title="ListagemArmas"
+    
+    <ShellContent 
+        Title="Armas"
         ContentTemplate="{DataTemplate viewsArmas:ListagemView}"
-        Route="ListagemArmas" />
+        Route="Armas" />
 
 </Shell>
